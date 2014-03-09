@@ -1,0 +1,181 @@
+#login password encrypted *
+#administrator password encrypted *
+user attribute administrator=on connection=serial,telnet,remote,http login-timer=300 host=any
+security class 1 on off on
+console character ascii
+console prompt megakiku
+login timer 1800
+ip route default gateway pp 1 filter 10 gateway pp 2
+ip route 192.168.113.0/24 gateway tunnel 8
+lan port-mirroring lan1 5 in 6 7 8 out 6 7 8
+switch control use lan1 on
+vlan lan1/1 802.1q vid=10 name=VLAN10
+ip lan1/1 address 10.0.0.254/24
+ip lan1/1 proxyarp on
+vlan lan1/2 802.1q vid=20 name=VLAN20
+ip lan1/2 address 10.1.20.254/24
+vlan lan1/3 802.1q vid=30 name=VLAN30
+ip lan1/3 address 10.1.30.254/24
+ip lan2 proxyarp off
+ip lan3 proxyarp off
+pp select 1
+ description pp PRV/PPPoE/0:BBIQ
+ pp keepalive use lcp-echo
+ pp keepalive interval 30 retry-interval=30 count=12
+ pp always-on on
+ pppoe use lan2
+ pppoe auto connect on
+ pppoe auto disconnect off
+ pp auth accept pap chap mschap mschap-v2
+ pp auth myname **id** **pw**
+ ppp lcp mru on 1454
+ ppp ipcp ipaddress on
+ ppp ipcp msext on
+ ppp ccp type none
+ ip pp mtu 1500
+ ip pp nat descriptor 1000
+ pp enable 1
+pp select 2
+ description pp PRV/PPPoE/1:OCN
+ pp always-on on
+ pppoe use lan3
+ pppoe auto connect on
+ pppoe auto disconnect on
+ pp auth accept pap chap
+ pp auth myname **id** **pw**
+ ppp lcp mru on 1454
+ ppp ipcp ipaddress on
+ ppp ipcp msext on
+ ip pp mtu 1454
+ ip pp nat descriptor 2000
+ pp enable 2
+pp select anonymous
+ pp bind tunnel15
+ pp auth request mschap-v2
+ pp auth username **id** **pw**
+ ppp ccp type mppe-any
+ ip pp remote address pool 10.0.0.231
+ ip pp mtu 1280
+ pptp service type server
+ pp enable anonymous
+tunnel select 8
+ description tunnel JRTEST
+ ipsec tunnel 8
+  ipsec sa policy 8 8 esp aes-cbc sha-hmac
+  ipsec ike keepalive use 8 on heartbeat
+  ipsec ike local address 8 10.0.0.254
+  ipsec ike pre-shared-key 8 text **key**
+  ipsec ike remote address 8 **id**.aa1.netvolante.jp
+ ip tunnel tcp mss limit auto
+ tunnel enable 8
+tunnel select 15
+ tunnel encapsulation pptp
+ pptp tunnel disconnect time 7200
+ tunnel enable 15
+ip filter 10 pass 10.0.0.0/24 * * * *
+nat descriptor log on
+nat descriptor type 1000 masquerade
+nat descriptor address outer 1000 ipcp
+nat descriptor address inner 1000 auto
+nat descriptor masquerade static 1000 1 10.0.0.12 tcp www
+nat descriptor masquerade static 1000 2 10.0.0.12 tcp https
+nat descriptor masquerade static 1000 3 10.0.0.254 udp 500
+nat descriptor masquerade static 1000 4 10.0.0.254 esp
+nat descriptor masquerade static 1000 5 10.0.0.254 tcp 1723
+nat descriptor masquerade static 1000 6 10.0.0.254 gre
+nat descriptor masquerade static 1000 7 10.0.0.1 tcp 21
+nat descriptor masquerade static 1000 8 10.0.0.1 tcp ftpdata
+nat descriptor type 2000 masquerade
+ipsec auto refresh on
+syslog notice on
+syslog debug on
+tftp host any
+dhcp service server
+dhcp server rfc2131 compliant except remain-silent
+dhcp scope 10 10.0.0.1-10.0.0.253/24 gateway 10.0.0.254 expire 0:30
+dhcp scope bind 10 10.0.0.1 ethernet 40:6c:8f:19:d1:93
+dhcp scope bind 10 10.0.0.2 ethernet 40:6c:8f:1a:55:cb
+dhcp scope bind 10 10.0.0.3 ethernet 7c:c3:a1:ab:a8:5c
+dhcp scope bind 10 10.0.0.4 ethernet 7c:c3:a1:aa:ce:be
+dhcp scope bind 10 10.0.0.5 ethernet 00:0c:29:3f:04:f6
+dhcp scope bind 10 10.0.0.10 ethernet 00:22:15:7d:f0:05
+dhcp scope bind 10 10.0.0.11 ethernet 00:0f:7c:08:a6:9b
+dhcp scope bind 10 10.0.0.12 ethernet 00:80:f0:ab:58:dc
+dhcp scope bind 10 10.0.0.15 ethernet 00:19:85:e3:3b:72
+dhcp scope bind 10 10.0.0.16 ethernet 00:19:85:e3:39:83
+dhcp scope bind 10 10.0.0.200 ethernet 00:24:a5:fe:0b:f6
+dhcp scope bind 10 10.0.0.201 ethernet 00:24:a5:fe:0b:7b
+dhcp scope bind 10 10.0.0.202 ethernet 00:24:a5:fe:0b:69
+dhcp scope bind 10 10.0.0.206 ethernet 00:1d:73:c4:6c:a8
+dhcp scope bind 10 10.0.0.250 ethernet 00:c0:8f:1e:14:2c
+dhcp scope bind 10 10.0.0.251 ethernet 00:c0:8f:1e:28:5c
+dhcp scope 20 10.1.20.1-10.1.20.253/24 gateway 10.1.20.254 expire 0:30
+dhcp scope bind 20 10.1.20.1 ethernet 7c:c3:a1:aa:ce:be
+dhcp scope bind 20 10.1.20.2 ethernet 7c:c3:a1:ab:a8:5c
+dhcp scope bind 20 10.1.20.3 ethernet 00:0c:29:3f:04:f6
+dhcp scope bind 20 10.1.20.32 ethernet 00:80:f0:a0:c2:92
+dhcp scope bind 20 10.1.20.200 ethernet 00:24:a5:fe:0b:f6
+dhcp scope bind 20 10.1.20.201 ethernet 00:24:a5:fe:0b:7b
+dhcp scope bind 20 10.1.20.202 ethernet 00:24:a5:fe:0b:69
+dhcp scope bind 20 10.1.20.203 ethernet 00:26:ab:9d:de:a7
+dhcp scope bind 20 10.1.20.204 ethernet 00:80:92:42:3c:95
+dhcp scope bind 20 10.1.20.205 ethernet 70:56:81:ea:d3:76
+dhcp scope bind 20 10.1.20.206 ethernet 00:22:cf:81:88:c6
+dhcp scope bind 20 10.1.20.210 ethernet 00:24:a5:51:f8:f1
+dhcp scope bind 20 10.1.20.220 ethernet 00:03:94:19:e1:d0
+dhcp scope 30 10.1.30.1-10.1.30.250/24 gateway 10.1.30.254 expire 48:00
+dhcp scope bind 30 10.1.30.200 ethernet 00:24:a5:fe:0b:f6
+dhcp scope bind 30 10.1.30.201 ethernet 00:24:a5:fe:0b:7b
+dhcp scope bind 30 10.1.30.202 ethernet 00:24:a5:fe:0b:69
+dhcp scope bind 30 10.1.30.206 ethernet 00:1d:73:c4:6c:a8
+dns server 8.8.8.8 8.8.4.4 129.250.35.250 129.250.35.251
+dns private address spoof on
+snmp host any
+snmpv2c host any
+snmp yrifppdisplayatmib2 on
+snmp yriftunneldisplayatmib2 on
+snmp yrifswitchdisplayatmib2 on
+snmp trap enable snmp coldstart warmstart linkup linkdown authenticationfailure
+snmp trap enable switch common all
+schedule at 1 */* 02:30 * ntpdate ntp.nict.jp syslog
+pptp service on
+pptp keepalive log off
+httpd host any
+http revision-up schedule monthly 1 23:00 0:00
+sshd service on
+sshd host key generate *
+statistics cpu on
+statistics memory on
+statistics traffic on
+diagnosis config port max-detect 60000
+switch select 00:a0:de:7d:ec:6c
+ switch control function set system-name SWX2200-8G_1F
+ switch control function set vlan-port-mode 6 hybrid
+ switch control function set vlan-port-mode 7 hybrid
+ switch control function set vlan-port-mode 8 hybrid
+ switch control function set vlan-access 1 10
+ switch control function set vlan-access 2 10
+ switch control function set vlan-access 3 10
+ switch control function set vlan-access 4 10
+ switch control function set vlan-access 5 20
+ switch control function set vlan-trunk 6 10 join
+ switch control function set vlan-trunk 6 20 join
+ switch control function set vlan-trunk 6 30 join
+ switch control function set vlan-trunk 7 10 join
+ switch control function set vlan-trunk 7 20 join
+ switch control function set vlan-trunk 7 30 join
+ switch control function set vlan-trunk 8 10 join
+ switch control function set vlan-trunk 8 20 join
+ switch control function set vlan-trunk 8 30 join
+switch select 00:a0:de:7d:ee:14
+ switch control function set system-name SWX2200-8G_4F
+ switch control function set vlan-port-mode 8 hybrid
+ switch control function set vlan-access 1 10
+ switch control function set vlan-access 2 10
+ switch control function set vlan-access 3 10
+ switch control function set vlan-access 4 20
+ switch control function set vlan-access 5 10
+ switch control function set vlan-access 6 20
+ switch control function set vlan-access 7 10
+ switch control function set vlan-trunk 8 10 join
+ switch control function set vlan-trunk 8 20 join
