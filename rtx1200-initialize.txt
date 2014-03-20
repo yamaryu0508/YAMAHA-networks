@@ -1,0 +1,4 @@
+no ip lan1 address 192.168.100.1/24
+no dhcp service server
+no dhcp server rfc2131 compliant except remain-silent
+no dhcp scope 1 192.168.100.2-192.168.100.191/24
