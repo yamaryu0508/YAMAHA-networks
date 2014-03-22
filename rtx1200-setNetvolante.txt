@@ -1,0 +1,9 @@
+# setting host account ******.***.netvolante.jp
+pp select 1
+ netvolante-dns hostname host pp ****** // host accout
+ 
+# after a few seconds
+netvolante-dns go pp 1
+
+# show status
+show status netvolante-dns pp 1
