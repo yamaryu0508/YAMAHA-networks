@@ -1,0 +1,14 @@
+ip route 192.168.100.0/24 gateway tunnel 1
+
+tunnel select 1
+ description tunnel REMOTE-MAINTAINANCE
+ ipsec tunnel 1
+  ipsec sa policy 1 1 esp aes-cbc sha-hmac
+  ipsec ike keepalive use 1 on heartbeat
+  ipsec ike local address 1 10.0.0.254
+  ipsec ike pre-shared-key 1 text remote
+  ipsec ike remote address 1 ****.aa0.netvolante.jp
+ ip tunnel tcp mss limit auto
+ tunnel enable 1
+ 
+ipsec auto refresh on
