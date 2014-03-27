@@ -1,0 +1,57 @@
+user attribute administrator=on connection=serial,telnet,remote,http login-timer=300 host=any
+security class 1 on on on
+console character ascii
+console prompt remote
+login timer 1800
+ip route default gateway pp 1
+vlan port mapping lan1.1 vlan1
+vlan port mapping lan1.2 vlan1
+vlan port mapping lan1.3 vlan2
+vlan port mapping lan1.4 vlan2
+vlan port mapping lan1.5 vlan1
+vlan port mapping lan1.6 vlan1
+vlan port mapping lan1.7 vlan2
+vlan port mapping lan1.8 vlan2
+lan type lan1 port-based-option=divide-network
+ip vlan1 address 10.1.1.254/24
+ip vlan1 proxyarp on
+ip vlan2 address 192.168.30.254/24
+pp select 1
+ description pp "PRV/MOBILE/0:EMOBILE G4"
+ pp bind usb1
+ pp keepalive interval 30 retry-interval=30 count=12
+ pp always-on on
+ pp auth accept pap chap
+ pp auth myname em em
+ ppp lcp mru on 1400
+ ppp lcp accm on
+ ppp lcp pfc on
+ ppp ipcp ipaddress on
+ ppp ipcp msext on
+ ppp ipv6cp use off
+ ip pp nat descriptor 1000
+ mobile auto connect on
+ mobile disconnect time off
+ mobile disconnect input time off
+ mobile disconnect output time off
+ mobile access-point name emb.ne.jp cid=1
+ mobile access limit length off
+ mobile access limit time off
+ pp enable 1
+nat descriptor type 1000 masquerade
+nat descriptor address outer 1000 ipcp
+nat descriptor address inner 1000 auto
+ipsec auto refresh on
+dhcp service server
+dhcp server rfc2131 compliant except remain-silent
+dhcp scope 1 10.1.1.10-10.1.1.100/24
+dhcp scope 2 192.168.30.10-192.168.30.100/24
+dns server pp 1
+dns server select 500001 pp 1 any . restrict pp 1
+dns private address spoof on
+snmp sysname yamaha-rtx1200-00a0de67d7c8
+schedule at 1 */* 01:20:00 * ntpdate ntp.nict.jp syslog
+statistics cpu on
+statistics memory on
+mobile use usb1 on
+mobile signal-strength on interface=usb1 syslog=on interval=3600
