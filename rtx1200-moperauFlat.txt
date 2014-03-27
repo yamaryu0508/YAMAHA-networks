@@ -1,0 +1,40 @@
+#login password encrypted *
+#administrator password encrypted *
+user attribute administrator=on connection=serial,telnet,remote,http login-timer=300 host=any
+console character ascii
+ip route default gateway pp 1
+ip lan1 address 192.168.100.1/24
+pp select 1
+ description pp PRV/MOBILE/0:mopera
+ pp bind usb1
+ pp keepalive interval 30 retry-interval=30 count=12
+ pp always-on on
+ pp auth accept pap chap
+ pp auth myname 0000 0000
+ ppp lcp mru off 1792
+ ppp lcp accm on
+ ppp lcp pfc on
+ ppp ipcp ipaddress on
+ ppp ipcp msext on
+ ppp ipv6cp use off
+ ip pp nat descriptor 1000
+ mobile auto connect on
+ mobile disconnect time off
+ mobile disconnect input time off
+ mobile disconnect output time off
+ mobile access-point name mopera.flat.foma.ne.jp cid=4
+ mobile access limit length off
+ mobile access limit time off
+ pp enable 1
+nat descriptor type 1000 masquerade
+dhcp service server
+dhcp server rfc2131 compliant except remain-silent
+dhcp scope 1 192.168.100.2-192.168.100.191/24
+dns server pp 1
+dns server select 500001 pp 1 any . restrict pp 1
+dns private address spoof on
+schedule at 1 */* 01:20:00 * ntpdate ntp.nict.jp syslog
+statistics cpu on
+statistics memory on
+mobile use usb1 on
+mobile signal-strength on interface=usb1 syslog=on interval=3600
